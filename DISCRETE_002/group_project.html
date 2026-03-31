@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boolean Logic Lab</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #060810;
+    --bg2: #0c0f1a;
+    --bg3: #111827;
+    --panel: #0d1117;
+    --border: #1e2d40;
+    --border2: #2a3f5f;
+    --neon: #00f5d4;
+    --neon2: #7c3aed;
+    --neon3: #f59e0b;
+    --neon4: #ef4444;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #475569;
+    --glow: 0 0 20px rgba(0,245,212,0.4);
+    --glow2: 0 0 20px rgba(124,58,237,0.4);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,245,212,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,245,212,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(124,58,237,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px 60px;
+  }
+
+  /* HEADER */
+  header {
+    padding: 40px 0 32px;
+    text-align: center;
+    position: relative;
+  }
+
+  .header-badge {
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--neon);
+    border: 1px solid rgba(0,245,212,0.3);
+    padding: 4px 14px;
+    border-radius: 2px;
+    margin-bottom: 16px;
+    animation: pulse-badge 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse-badge {
+    0%,100% { box-shadow: 0 0 8px rgba(0,245,212,0.2); }
+    50% { box-shadow: 0 0 18px rgba(0,245,212,0.5); }
+  }
+
+  h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(28px, 5vw, 52px);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    background: linear-gradient(135deg, #fff 20%, var(--neon) 60%, var(--neon2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle {
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--text3);
+    letter-spacing: 0.05em;
+  }
+
+  .subtitle span { color: var(--neon2); }
+
+  /* INPUT SECTION */
+  .input-section {
+    background: var(--panel);
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .input-section::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--neon), var(--neon2), transparent);
+  }
+
+  .input-label {
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--neon);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .input-label::before {
+    content: '//';
+    color: var(--text3);
+  }
+
+  .input-row {
+    display: flex;
+    gap: 12px;
+    align-items: stretch;
+    flex-wrap: wrap;
+  }
+
+  .expr-input {
+    flex: 1;
+    min-width: 280px;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    color: var(--text);
+    outline: none;
+    transition: all 0.3s ease;
+    letter-spacing: 0.04em;
+  }
+
+  .expr-input:focus {
+    border-color: var(--neon);
+    box-shadow: 0 0 0 3px rgba(0,245,212,0.1), inset 0 0 20px rgba(0,245,212,0.03);
+  }
+
+  .expr-input::placeholder { color: var(--text3); }
+
+  .btn-generate {
+    background: linear-gradient(135deg, var(--neon2), #4f46e5);
+    border: none;
+    border-radius: 8px;
+    padding: 14px 28px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+  }
+
+  .btn-generate:hover {
+    box-shadow: 0 0 25px rgba(124,58,237,0.6);
+    transform: translateY(-1px);
+  }
+
+  .btn-generate:active { transform: translateY(0); }
+
+  .btn-clear {
+    background: transparent;
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 14px 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .btn-clear:hover {
+    border-color: var(--neon4);
+    color: var(--neon4);
+    box-shadow: 0 0 15px rgba(239,68,68,0.2);
+  }
+
+  /* EXAMPLES */
+  .examples {
+    margin-top: 16px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .examples-label {
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .example-chip {
+    background: rgba(0,245,212,0.05);
+    border: 1px solid rgba(0,245,212,0.2);
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-size: 11px;
+    color: var(--neon);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .example-chip:hover {
+    background: rgba(0,245,212,0.12);
+    border-color: var(--neon);
+    box-shadow: 0 0 10px rgba(0,245,212,0.2);
+  }
+
+  /* OPERATOR REFERENCE */
+  .op-ref {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.02);
+    border-radius: 6px;
+    border-left: 2px solid var(--neon2);
+    font-size: 11px;
+    color: var(--text3);
+    line-height: 1.8;
+  }
+
+  .op-ref strong { color: var(--neon); }
+
+  /* ERROR */
+  .error-msg {
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: rgba(239,68,68,0.08);
+    border: 1px solid rgba(239,68,68,0.3);
+    border-radius: 6px;
+    font-size: 12px;
+    color: var(--neon4);
+    display: none;
+  }
+
+  /* MAIN LAYOUT */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  @media (max-width: 900px) {
+    .main-grid { grid-template-columns: 1fr; }
+  }
+
+  /* PANELS */
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,0.02);
+  }
+
+  .panel-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .panel-title .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    animation: blink 2s ease-in-out infinite;
+  }
+
+  .dot-green { background: var(--neon); box-shadow: 0 0 8px var(--neon); }
+  .dot-purple { background: var(--neon2); box-shadow: 0 0 8px var(--neon2); }
+
+  @keyframes blink {
+    0%,100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .panel-meta {
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 0.1em;
+  }
+
+  /* TRUTH TABLE */
+  .table-wrap {
+    padding: 20px;
+    overflow-x: auto;
+    min-height: 200px;
+  }
+
+  .truth-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .truth-table th {
+    padding: 10px 16px;
+    text-align: center;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--neon);
+    border-bottom: 1px solid var(--border2);
+    white-space: nowrap;
+  }
+
+  .truth-table th.output-col {
+    color: var(--neon3);
+    position: relative;
+  }
+
+  .truth-table th.output-col::after {
+    content: '';
+    position: absolute;
+    bottom: -1px; left: 0; right: 0;
+    height: 2px;
+    background: var(--neon3);
+    box-shadow: 0 0 8px var(--neon3);
+  }
+
+  .truth-table td {
+    padding: 9px 16px;
+    text-align: center;
+    border-bottom: 1px solid rgba(30,45,64,0.5);
+    transition: background 0.15s ease;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .truth-table tr:hover td { background: rgba(0,245,212,0.04); }
+
+  .truth-table tr:last-child td { border-bottom: none; }
+
+  .val-0 { color: var(--text3); }
+  .val-1 { color: #fff; font-weight: 700; }
+
+  .out-0 {
+    color: var(--neon4);
+    text-shadow: 0 0 10px rgba(239,68,68,0.5);
+    font-weight: 700;
+  }
+
+  .out-1 {
+    color: var(--neon);
+    text-shadow: 0 0 12px rgba(0,245,212,0.6);
+    font-weight: 700;
+    font-size: 15px;
+  }
+
+  /* EMPTY STATE */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    color: var(--text3);
+    gap: 12px;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-align: center;
+  }
+
+  .empty-icon {
+    font-size: 36px;
+    opacity: 0.3;
+    filter: grayscale(1);
+  }
+
+  /* CIRCUIT CANVAS */
+  .circuit-wrap {
+    padding: 20px;
+    overflow: auto;
+    min-height: 320px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  #circuitCanvas {
+    display: block;
+    border-radius: 8px;
+    background: transparent;
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: flex;
+    gap: 0;
+    border-top: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .stat-item {
+    flex: 1;
+    padding: 14px 16px;
+    text-align: center;
+    border-right: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-item:last-child { border-right: none; }
+
+  .stat-num {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--neon);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-top: 4px;
+  }
+
+  /* BOTTOM PANEL - Full width */
+  .full-panel {
+    margin-top: 24px;
+  }
+
+  /* EXPRESSION TREE */
+  .expr-display {
+    padding: 20px;
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 2;
+  }
+
+  .token-var { color: #60a5fa; font-weight: 600; }
+  .token-op { color: var(--neon3); font-weight: 700; }
+  .token-paren { color: var(--text3); }
+  .token-not { color: #f472b6; font-weight: 700; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg2); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--neon2); }
+
+  /* LOADING ANIMATION */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .anim-in { animation: fadeInUp 0.4s ease forwards; }
+
+  /* TOOLTIP */
+  .tooltip {
+    position: relative;
+    cursor: help;
+  }
+
+  /* Scanline overlay */
+  .scanlines {
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.03) 2px,
+      rgba(0,0,0,0.03) 4px
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* var display */
+  .var-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 12px 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .var-badge {
+    background: rgba(96,165,250,0.1);
+    border: 1px solid rgba(96,165,250,0.3);
+    border-radius: 4px;
+    padding: 3px 10px;
+    font-size: 11px;
+    color: #60a5fa;
+    font-family: 'JetBrains Mono', monospace;
+  }
+</style>
+</head>
+<body>
+<div class="scanlines"></div>
+<div class="container">
+
+  <header>
+    <div class="header-badge">Boolean Logic Lab v2.0</div>
+    <h1>Truth Table &<br>Circuit Generator</h1>
+    <p class="subtitle">Parse · Evaluate · <span>Visualize</span> Boolean Algebra</p>
+  </header>
+
+  <!-- INPUT -->
+  <div class="input-section">
+    <div class="input-label">Expression Input</div>
+    <div class="input-row">
+      <input type="text" class="expr-input" id="exprInput"
+        placeholder="e.g.  (P AND Q) OR (NOT R)"
+        spellcheck="false" autocomplete="off" />
+      <button class="btn-generate" onclick="generate()">▶ Generate</button>
+      <button class="btn-clear" onclick="clearAll()">✕ Clear</button>
+    </div>
+    <div class="examples">
+      <span class="examples-label">Try:</span>
+      <span class="example-chip" onclick="setExample('(P AND Q) OR (NOT R)')">( P AND Q ) OR ( NOT R )</span>
+      <span class="example-chip" onclick="setExample('(A XOR B) AND (A OR B)')">( A XOR B ) AND ( A OR B )</span>
+      <span class="example-chip" onclick="setExample('NOT (P AND Q) OR R')">NOT ( P AND Q ) OR R</span>
+      <span class="example-chip" onclick="setExample('(A AND B) OR (C AND D)')">( A AND B ) OR ( C AND D )</span>
+      <span class="example-chip" onclick="setExample('P NAND (Q XOR R)')">P NAND ( Q XOR R )</span>
+    </div>
+    <div class="op-ref">
+      <strong>Operators:</strong> AND &nbsp;·&nbsp; OR &nbsp;·&nbsp; NOT &nbsp;·&nbsp; XOR &nbsp;·&nbsp; NAND &nbsp;·&nbsp; NOR &nbsp;·&nbsp; XNOR
+      &nbsp;&nbsp;|&nbsp;&nbsp;
+      <strong>Symbols:</strong> && &nbsp;·&nbsp; || &nbsp;·&nbsp; ! &nbsp;·&nbsp; ^ &nbsp;·&nbsp; ~ &nbsp;&nbsp;|&nbsp;&nbsp;
+      Variables: single letters (A–Z) or words
+    </div>
+    <div class="error-msg" id="errorMsg"></div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="main-grid">
+
+    <!-- TRUTH TABLE PANEL -->
+    <div class="panel" id="truthPanel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <span class="dot dot-green"></span>
+          Truth Table
+        </div>
+        <span class="panel-meta" id="tableMetaLabel">—</span>
+      </div>
+      <div class="table-wrap" id="tableWrap">
+        <div class="empty-state">
+          <div class="empty-icon">⊕</div>
+          <div>Enter a boolean expression above<br>to generate the truth table</div>
+        </div>
+      </div>
+      <div class="var-badges" id="varBadges"></div>
+      <div class="stats-bar" id="statsBar" style="display:none">
+        <div class="stat-item">
+          <div class="stat-num" id="statRows">0</div>
+          <div class="stat-label">Rows</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" id="statVars">0</div>
+          <div class="stat-label">Variables</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" id="statTrue">0</div>
+          <div class="stat-label">True</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" id="statFalse">0</div>
+          <div class="stat-label">False</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CIRCUIT PANEL -->
+    <div class="panel" id="circuitPanel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <span class="dot dot-purple"></span>
+          Logic Circuit
+        </div>
+        <span class="panel-meta" id="circuitMetaLabel">—</span>
+      </div>
+      <div class="circuit-wrap" id="circuitWrap">
+        <div class="empty-state">
+          <div class="empty-icon">◈</div>
+          <div>Circuit diagram will appear here<br>after generation</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  LEXER
+// ═══════════════════════════════════════════════════════════
+function tokenize(expr) {
+  const tokens = [];
+  let i = 0;
+  const s = expr.toUpperCase().trim();
+  while (i < s.length) {
+    if (/\s/.test(s[i])) { i++; continue; }
+    if (s[i] === '(') { tokens.push({t:'LPAREN', v:'('}); i++; continue; }
+    if (s[i] === ')') { tokens.push({t:'RPAREN', v:')'}); i++; continue; }
+    if (s[i] === '!' || s[i] === '~') { tokens.push({t:'NOT', v:'NOT'}); i++; continue; }
+    if (s[i] === '^') { tokens.push({t:'XOR', v:'XOR'}); i++; continue; }
+    if (s[i] === '&' && s[i+1] === '&') { tokens.push({t:'AND', v:'AND'}); i+=2; continue; }
+    if (s[i] === '|' && s[i+1] === '|') { tokens.push({t:'OR', v:'OR'}); i+=2; continue; }
+    if (/[A-Z]/.test(s[i])) {
+      let word = '';
+      while (i < s.length && /[A-Z0-9_]/.test(s[i])) { word += s[i]; i++; }
+      const ops = ['AND','OR','NOT','XOR','NAND','NOR','XNOR'];
+      if (ops.includes(word)) {
+        tokens.push({t: word, v: word});
+      } else {
+        tokens.push({t:'VAR', v: word});
+      }
+      continue;
+    }
+    throw new Error(`Unknown character: '${s[i]}'`);
+  }
+  return tokens;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PARSER (Recursive Descent)
+// ═══════════════════════════════════════════════════════════
+function parse(tokens) {
+  let pos = 0;
+
+  function peek() { return tokens[pos]; }
+  function consume(type) {
+    const t = tokens[pos];
+    if (type && (!t || t.t !== type)) throw new Error(`Expected ${type}, got ${t ? t.t : 'EOF'}`);
+    pos++;
+    return t;
+  }
+
+  // Precedence: OR < XOR < AND < NOT
+  function parseExpr() { return parseOR(); }
+
+  function parseOR() {
+    let left = parseXOR();
+    while (peek() && (peek().t === 'OR' || peek().t === 'NOR')) {
+      const op = consume();
+      const right = parseXOR();
+      left = {type: op.t, left, right};
+    }
+    return left;
+  }
+
+  function parseXOR() {
+    let left = parseAND();
+    while (peek() && (peek().t === 'XOR' || peek().t === 'XNOR')) {
+      const op = consume();
+      const right = parseAND();
+      left = {type: op.t, left, right};
+    }
+    return left;
+  }
+
+  function parseAND() {
+    let left = parseNOT();
+    while (peek() && (peek().t === 'AND' || peek().t === 'NAND')) {
+      const op = consume();
+      const right = parseNOT();
+      left = {type: op.t, left, right};
+    }
+    return left;
+  }
+
+  function parseNOT() {
+    if (peek() && peek().t === 'NOT') {
+      consume('NOT');
+      const operand = parseNOT();
+      return {type: 'NOT', operand};
+    }
+    return parsePrimary();
+  }
+
+  function parsePrimary() {
+    const t = peek();
+    if (!t) throw new Error('Unexpected end of expression');
+    if (t.t === 'LPAREN') {
+      consume('LPAREN');
+      const node = parseExpr();
+      consume('RPAREN');
+      return node;
+    }
+    if (t.t === 'VAR') {
+      consume('VAR');
+      return {type: 'VAR', name: t.v};
+    }
+    throw new Error(`Unexpected token: ${t.v}`);
+  }
+
+  const ast = parseExpr();
+  if (pos < tokens.length) throw new Error(`Unexpected token: ${tokens[pos].v}`);
+  return ast;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  EVALUATOR
+// ═══════════════════════════════════════════════════════════
+function evaluate(node, env) {
+  switch (node.type) {
+    case 'VAR': return env[node.name] ? 1 : 0;
+    case 'NOT': return evaluate(node.operand, env) ? 0 : 1;
+    case 'AND': return (evaluate(node.left, env) & evaluate(node.right, env));
+    case 'OR':  return (evaluate(node.left, env) | evaluate(node.right, env));
+    case 'XOR': return (evaluate(node.left, env) ^ evaluate(node.right, env));
+    case 'NAND': return ((evaluate(node.left, env) & evaluate(node.right, env)) ? 0 : 1);
+    case 'NOR':  return ((evaluate(node.left, env) | evaluate(node.right, env)) ? 0 : 1);
+    case 'XNOR': return ((evaluate(node.left, env) ^ evaluate(node.right, env)) ? 0 : 1);
+    default: throw new Error(`Unknown node type: ${node.type}`);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  COLLECT VARIABLES
+// ═══════════════════════════════════════════════════════════
+function collectVars(node, vars = new Set()) {
+  if (node.type === 'VAR') { vars.add(node.name); return vars; }
+  if (node.operand) collectVars(node.operand, vars);
+  if (node.left) collectVars(node.left, vars);
+  if (node.right) collectVars(node.right, vars);
+  return vars;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  TRUTH TABLE GENERATOR
+// ═══════════════════════════════════════════════════════════
+function generateTruthTable(ast, vars) {
+  const varList = [...vars].sort();
+  const rows = [];
+  const count = 1 << varList.length;
+  for (let i = 0; i < count; i++) {
+    const env = {};
+    varList.forEach((v, idx) => {
+      env[v] = (i >> (varList.length - 1 - idx)) & 1;
+    });
+    const result = evaluate(ast, env);
+    rows.push({env, result});
+  }
+  return {varList, rows};
+}
+
+// ═══════════════════════════════════════════════════════════
+//  CIRCUIT DRAWING
+// ═══════════════════════════════════════════════════════════
+const GATE_W = 64;
+const GATE_H = 44;
+const H_GAP = 90;
+const V_GAP = 60;
+
+function layoutTree(node, depth = 0) {
+  if (node.type === 'VAR') {
+    return {node, depth, height: 1, children: []};
+  }
+  const children = [];
+  if (node.operand) {
+    children.push(layoutTree(node.operand, depth + 1));
+  }
+  if (node.left) children.push(layoutTree(node.left, depth + 1));
+  if (node.right) children.push(layoutTree(node.right, depth + 1));
+
+  const height = children.reduce((s, c) => s + c.height, 0);
+  return {node, depth, height: Math.max(1, height), children};
+}
+
+function assignPositions(layout, startY = 0, varMap = new Map(), varYMap = new Map()) {
+  const positions = new Map();
+  let nextVarY = startY;
+
+  function assign(l, y) {
+    if (l.node.type === 'VAR') {
+      const name = l.node.name;
+      if (!varYMap.has(name)) {
+        varYMap.set(name, nextVarY);
+        nextVarY += V_GAP;
+      }
+      const vy = varYMap.get(name);
+      positions.set(l, {x: 0, y: vy, id: Math.random()});
+      return vy;
+    }
+
+    let childY = y;
+    const childCenters = [];
+    for (const child of l.children) {
+      const cy = assign(child, childY);
+      childCenters.push(cy);
+      childY += child.height * V_GAP;
+    }
+    const my = childCenters.length > 0
+      ? (childCenters[0] + childCenters[childCenters.length - 1]) / 2
+      : y;
+    positions.set(l, {x: l.depth, y: my, id: Math.random()});
+    if (nextVarY < my + 1) nextVarY = my + V_GAP;
+    return my;
+  }
+  assign(layout, startY);
+  return {positions, varYMap};
+}
+
+function drawCircuit(ast) {
+  const layout = layoutTree(ast);
+  const varYMap = new Map();
+  const {positions} = assignPositions(layout, 40, new Map(), varYMap);
+
+  // Find max depth = number of columns
+  let maxDepth = 0;
+  positions.forEach((pos) => { if (pos.x > maxDepth) maxDepth = pos.x; });
+
+  // Flip x: depth 0 = rightmost (output), deeper = further left
+  const canvasWidth = (maxDepth + 2) * H_GAP + GATE_W + 120;
+  const canvasHeight = Math.max(300, varYMap.size * V_GAP + 120);
+
+  const wrap = document.getElementById('circuitWrap');
+  wrap.innerHTML = '';
+  const canvas = document.createElement('canvas');
+  canvas.id = 'circuitCanvas';
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = canvasWidth * dpr;
+  canvas.height = canvasHeight * dpr;
+  canvas.style.width = canvasWidth + 'px';
+  canvas.style.height = canvasHeight + 'px';
+  wrap.appendChild(canvas);
+
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  // Background
+  ctx.fillStyle = '#060810';
+  ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+  // Grid
+  ctx.strokeStyle = 'rgba(0,245,212,0.04)';
+  ctx.lineWidth = 1;
+  for (let x = 0; x < canvasWidth; x += 20) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvasHeight); ctx.stroke();
+  }
+  for (let y = 0; y < canvasHeight; y += 20) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvasWidth, y); ctx.stroke();
+  }
+
+  // Convert depth to x pixel (flipped)
+  function gx(depth) {
+    return canvasWidth - 70 - depth * H_GAP - GATE_W / 2;
+  }
+  function gy(yVal) { return yVal + 30; }
+
+  // Draw connections then gates
+  const posArr = [];
+  positions.forEach((pos, l) => posArr.push({l, pos}));
+
+  // DRAW WIRES
+  posArr.forEach(({l, pos}) => {
+    if (l.node.type === 'VAR') return;
+    const px = gx(pos.x);
+    const py = gy(pos.y);
+
+    l.children.forEach((child, idx) => {
+      const cpos = positions.get(child);
+      const cx = gx(cpos.x);
+      const cy = gy(cpos.y);
+
+      const inputY = child.node.type === 'VAR'
+        ? cy
+        : cy;
+
+      // Input pin of parent
+      const numInputs = l.children.length;
+      const pinOffset = numInputs === 1 ? 0 : (idx === 0 ? -10 : 10);
+      const parentInputY = py + pinOffset;
+
+      ctx.beginPath();
+      ctx.strokeStyle = 'rgba(0,245,212,0.5)';
+      ctx.lineWidth = 1.5;
+      ctx.shadowColor = 'rgba(0,245,212,0.3)';
+      ctx.shadowBlur = 4;
+
+      const midX = (px - GATE_W / 2 + cx + GATE_W / 2) / 2;
+      ctx.moveTo(cx + GATE_W / 2, inputY);
+      ctx.bezierCurveTo(midX, inputY, midX, parentInputY, px - GATE_W / 2, parentInputY);
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    });
+  });
+
+  // Output wire from root
+  const rootLayout = layout;
+  const rootPos = positions.get(rootLayout);
+  if (rootPos) {
+    const rx = gx(rootPos.x) + GATE_W / 2;
+    const ry = gy(rootPos.y);
+    ctx.beginPath();
+    ctx.strokeStyle = 'rgba(245,158,11,0.8)';
+    ctx.lineWidth = 2;
+    ctx.shadowColor = 'rgba(245,158,11,0.5)';
+    ctx.shadowBlur = 8;
+    ctx.moveTo(rx, ry);
+    ctx.lineTo(rx + 40, ry);
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // Output label
+    ctx.fillStyle = '#f59e0b';
+    ctx.font = 'bold 11px JetBrains Mono, monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText('OUT', rx + 44, ry + 4);
+  }
+
+  // DRAW GATES
+  posArr.forEach(({l, pos}) => {
+    const px = gx(pos.x);
+    const py = gy(pos.y);
+    drawGate(ctx, l.node.type, px, py);
+  });
+
+  // DRAW INPUT LABELS (variables)
+  varYMap.forEach((yVal, varName) => {
+    const px = gx(maxDepth);
+    const py = gy(yVal);
+
+    // Input line
+    ctx.beginPath();
+    ctx.strokeStyle = 'rgba(96,165,250,0.6)';
+    ctx.lineWidth = 1.5;
+    ctx.shadowColor = 'rgba(96,165,250,0.3)';
+    ctx.shadowBlur = 4;
+    ctx.moveTo(px - 50, py);
+    ctx.lineTo(px - GATE_W / 2, py);
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // Variable dot
+    ctx.beginPath();
+    ctx.arc(px - 50, py, 4, 0, Math.PI * 2);
+    ctx.fillStyle = '#60a5fa';
+    ctx.shadowColor = '#60a5fa';
+    ctx.shadowBlur = 8;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Label
+    ctx.fillStyle = '#60a5fa';
+    ctx.font = 'bold 13px JetBrains Mono, monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText(varName, px - 58, py + 5);
+
+    // VAR box at the actual VAR node position
+    posArr.forEach(({l: vl, pos: vpos}) => {
+      if (vl.node.type === 'VAR' && vl.node.name === varName) {
+        const vx = gx(vpos.x);
+        const vy = gy(vpos.y);
+        if (Math.abs(vpos.x - maxDepth) < 0.1) {
+          // Same position, don't draw extra
+        }
+      }
+    });
+  });
+
+  document.getElementById('circuitMetaLabel').textContent = `${posArr.filter(p => p.l.node.type !== 'VAR').length} gates`;
+}
+
+function drawGate(ctx, type, cx, cy) {
+  const w = GATE_W;
+  const h = GATE_H;
+  const x = cx - w / 2;
+  const y = cy - h / 2;
+
+  // Gate colors
+  const colors = {
+    AND:  {fill: 'rgba(124,58,237,0.15)', stroke: '#7c3aed', text: '#a78bfa'},
+    OR:   {fill: 'rgba(0,245,212,0.10)', stroke: '#00f5d4', text: '#5eead4'},
+    NOT:  {fill: 'rgba(244,114,182,0.12)', stroke: '#f472b6', text: '#f9a8d4'},
+    XOR:  {fill: 'rgba(245,158,11,0.12)', stroke: '#f59e0b', text: '#fcd34d'},
+    NAND: {fill: 'rgba(239,68,68,0.12)', stroke: '#ef4444', text: '#fca5a5'},
+    NOR:  {fill: 'rgba(20,184,166,0.12)', stroke: '#14b8a6', text: '#5eead4'},
+    XNOR: {fill: 'rgba(168,85,247,0.12)', stroke: '#a855f7', text: '#d8b4fe'},
+  };
+
+  const c = colors[type] || {fill: 'rgba(100,100,100,0.1)', stroke: '#666', text: '#999'};
+
+  ctx.shadowColor = c.stroke;
+  ctx.shadowBlur = 12;
+
+  // Draw gate body
+  ctx.beginPath();
+  if (type === 'NOT') {
+    // Triangle shape
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + w - 10, cy);
+    ctx.lineTo(x, y + h);
+    ctx.closePath();
+  } else {
+    // Rounded rectangle
+    const r = 8;
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+
+  ctx.fillStyle = c.fill;
+  ctx.fill();
+  ctx.strokeStyle = c.stroke;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  // NOT bubble
+  if (type === 'NOT' || type === 'NAND' || type === 'NOR' || type === 'XNOR') {
+    ctx.beginPath();
+    const bx = type === 'NOT' ? x + w - 10 + 7 : x + w + 6;
+    ctx.arc(bx, cy, 5, 0, Math.PI * 2);
+    ctx.fillStyle = c.fill;
+    ctx.fill();
+    ctx.strokeStyle = c.stroke;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  }
+
+  // Gate label
+  ctx.fillStyle = c.text;
+  ctx.font = 'bold 10px Orbitron, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.shadowColor = c.stroke;
+  ctx.shadowBlur = 6;
+  const labelX = type === 'NOT' ? x + (w - 10) * 0.4 : cx;
+  ctx.fillText(type, labelX, cy);
+  ctx.shadowBlur = 0;
+  ctx.textBaseline = 'alphabetic';
+}
+
+// ═══════════════════════════════════════════════════════════
+//  MAIN GENERATE FUNCTION
+// ═══════════════════════════════════════════════════════════
+function generate() {
+  const expr = document.getElementById('exprInput').value.trim();
+  const errorEl = document.getElementById('errorMsg');
+  errorEl.style.display = 'none';
+
+  if (!expr) {
+    showError('Please enter a boolean expression.');
+    return;
+  }
+
+  try {
+    const tokens = tokenize(expr);
+    if (tokens.length === 0) { showError('Empty expression.'); return; }
+    const ast = parse(tokens);
+    const vars = collectVars(ast);
+
+    if (vars.size === 0) { showError('No variables found in expression.'); return; }
+    if (vars.size > 6) { showError('Maximum 6 variables supported (would generate ' + (1 << vars.size) + ' rows).'); return; }
+
+    const {varList, rows} = generateTruthTable(ast, vars);
+    renderTruthTable(varList, rows, expr);
+    drawCircuit(ast);
+
+    document.getElementById('statsBar').style.display = 'flex';
+    document.getElementById('statRows').textContent = rows.length;
+    document.getElementById('statVars').textContent = varList.length;
+    const trueCount = rows.filter(r => r.result).length;
+    document.getElementById('statTrue').textContent = trueCount;
+    document.getElementById('statFalse').textContent = rows.length - trueCount;
+
+    const badgesEl = document.getElementById('varBadges');
+    badgesEl.innerHTML = varList.map(v => `<span class="var-badge">${v}</span>`).join('');
+
+    document.getElementById('tableMetaLabel').textContent = `${rows.length} rows`;
+
+  } catch (e) {
+    showError('Parse error: ' + e.message);
+  }
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorMsg');
+  el.textContent = '⚠ ' + msg;
+  el.style.display = 'block';
+}
+
+function renderTruthTable(varList, rows, expr) {
+  const wrap = document.getElementById('tableWrap');
+
+  // Shorten expression for header
+  let exprShort = expr.length > 20 ? expr.substring(0, 18) + '…' : expr;
+
+  let html = `<table class="truth-table anim-in"><thead><tr>`;
+  varList.forEach(v => {
+    html += `<th>${v}</th>`;
+  });
+  html += `<th class="output-col" title="${expr.replace(/"/g, '&quot;')}">f(${varList.join(',')})</th></tr></thead><tbody>`;
+
+  rows.forEach(row => {
+    html += '<tr>';
+    varList.forEach(v => {
+      const val = row.env[v];
+      html += `<td class="${val ? 'val-1' : 'val-0'}">${val}</td>`;
+    });
+    html += `<td class="${row.result ? 'out-1' : 'out-0'}">${row.result}</td>`;
+    html += '</tr>';
+  });
+
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+}
+
+function setExample(expr) {
+  document.getElementById('exprInput').value = expr;
+  generate();
+}
+
+function clearAll() {
+  document.getElementById('exprInput').value = '';
+  document.getElementById('errorMsg').style.display = 'none';
+  document.getElementById('tableWrap').innerHTML = `
+    <div class="empty-state">
+      <div class="empty-icon">⊕</div>
+      <div>Enter a boolean expression above<br>to generate the truth table</div>
+    </div>`;
+  document.getElementById('circuitWrap').innerHTML = `
+    <div class="empty-state">
+      <div class="empty-icon">◈</div>
+      <div>Circuit diagram will appear here<br>after generation</div>
+    </div>`;
+  document.getElementById('statsBar').style.display = 'none';
+  document.getElementById('varBadges').innerHTML = '';
+  document.getElementById('tableMetaLabel').textContent = '—';
+  document.getElementById('circuitMetaLabel').textContent = '—';
+}
+
+// Enter key
+document.getElementById('exprInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') generate();
+});
+
+// Auto-load demo
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    setExample('(P AND Q) OR (NOT R)');
+  }, 300);
+});
+</script>
+</body>
+</html>
